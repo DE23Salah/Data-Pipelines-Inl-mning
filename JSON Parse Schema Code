@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "integer"
+    },
+    "age": {
+      "type": "integer"
+    },
+    "signup_date": {
+      "type": "string"
+    }
+  }
+}
