@@ -1,0 +1,50 @@
+import json
+import random
+import datetime
+from azure.storage.queue import QueueClient
+from azure.core.exceptions import ResourceExistsError
+
+# Azure Storage account details
+connection_string = "DefaultEndpointsProtocol=https;AccountName=salahde23;AccountKey=Ttb7LIAo2WbxtKalLw0EQD31kKXf37CfRtmeomH2xrXDyj0Rr6BayJotFtkTj8xgwn0wSBOHiBFM+AStQcBy0g==;EndpointSuffix=core.windows.net"
+queue_name = "databas-inl-queue"
+
+def generate_user():
+    user_id = random.randint(1000, 9999)
+    age = random.randint(18, 80)
+    signup_date = datetime.date(2024, 1, 1) + datetime.timedelta(days=random.randint(0, 268))
+    
+    return {
+        "user_id": user_id,
+        "age": age,
+        "signup_date": str(signup_date)
+    }
+
+def generate_sample_data(num_users):
+    return [generate_user() for _ in range(num_users)]
+
+if __name__ == "__main__":
+    num_users = 50
+    sample_data = generate_sample_data(num_users)
+    
+    # Create a queue client
+    queue_client = QueueClient.from_connection_string(connection_string, queue_name)
+
+    # Create the queue if it doesn't exist
+    try:
+        queue_client.create_queue()
+    except ResourceExistsError:
+        pass
+
+    # Send each user data to the queue
+    for user in sample_data:
+        message = json.dumps(user)
+        queue_client.send_message(message)
+        print(f"Sent message: {message}")
+
+    print(f"{num_users} sample users have been generated and sent to the Azure Storage queue")
+
+    # Optionally, still save to local JSON file
+    with open("sample_users.json", "w") as f:
+        json.dump(sample_data, f, indent=2)
+    
+    print(f"{num_users} sample users have also been saved to sample_users.json")
