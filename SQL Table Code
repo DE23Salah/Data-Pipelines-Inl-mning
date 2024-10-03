@@ -1,0 +1,5 @@
+CREATE TABLE Users (
+    user_id INT PRIMARY KEY,
+    age INT,
+    signup_date DATE
+);
